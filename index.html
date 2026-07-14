@@ -1879,6 +1879,14 @@ tbody tr:hover { background: var(--surface-2); }
               <p>Suba uma planilha .xlsx ou .csv com a equipe.</p>
             </button>
 
+            <button class="admin-card" data-action="diagnose">
+              <span class="admin-card__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8.5 16a5 5 0 0 1 7 0"/><path d="M12 20h.01"/><path d="M12 4v4"/></svg>
+              </span>
+              <h3>Testar conexão</h3>
+              <p>Veja o que o Apps Script está devolvendo agora.</p>
+            </button>
+
             <button class="admin-card" data-action="export-excel">
               <span class="admin-card__icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 21h16"/></svg>
@@ -3844,6 +3852,17 @@ tbody tr:hover { background: var(--surface-2); }
         body: JSON.stringify({ action, ...payload })
       });
     }
+    /** Requisição crua, sem retry nem parse — usada pelo diagnóstico. */
+    async raw(params) {
+      const url = `${this.config.endpoint}?${new URLSearchParams(params)}`;
+      const response = await fetch(url, { method: "GET", redirect: "follow", cache: "no-store" });
+      const text = await response.text();
+      return {
+        status: response.status,
+        contentType: response.headers.get("content-type") || "(sem content-type)",
+        text: text.slice(0, 1200)
+      };
+    }
     async #send(url, options, attempt = 0) {
       if (!navigator.onLine) throw new ApiError(FRIENDLY.offline, { code: "offline" });
       const controller = new AbortController();
@@ -3929,8 +3948,12 @@ tbody tr:hover { background: var(--surface-2); }
     }
   };
   var http = new HttpClient(CONFIG);
-  async function withFallback(realCall, demoCall) {
-    if (Demo.active) return demoCall();
+  async function readOrDemo(realCall, demoCall) {
+    if (Demo.active) {
+      const result = await demoCall();
+      result.__demo = true;
+      return result;
+    }
     try {
       return await realCall();
     } catch (error) {
@@ -3943,8 +3966,44 @@ tbody tr:hover { background: var(--surface-2); }
       throw error;
     }
   }
+  async function mutate(realCall, demoCall) {
+    if (Demo.active) {
+      const result = await demoCall();
+      result.__demo = true;
+      return result;
+    }
+    return realCall();
+  }
+  async function diagnose() {
+    const report = { endpoint: CONFIG.endpoint, demo: Demo.active, steps: [] };
+    for (const action of ["ping", "list", "announcements"]) {
+      try {
+        const raw = await http.raw({ action });
+        const isJson = raw.text.trim().startsWith("{") || raw.text.trim().startsWith("[");
+        const isLogin = /accounts\.google\.com|Fa\u00e7a login|Sign in/i.test(raw.text);
+        report.steps.push({
+          action,
+          status: raw.status,
+          contentType: raw.contentType,
+          ok: raw.status === 200 && isJson,
+          diagnosis: isLogin ? 'O Apps Script pediu login \u2014 a implanta\xE7\xE3o N\xC3O est\xE1 como "Qualquer pessoa".' : !isJson ? "Veio HTML em vez de JSON \u2014 a implanta\xE7\xE3o est\xE1 desatualizada ou com erro." : "Resposta JSON v\xE1lida.",
+          preview: raw.text.slice(0, 320)
+        });
+      } catch (error) {
+        report.steps.push({
+          action,
+          status: 0,
+          contentType: "\u2014",
+          ok: false,
+          diagnosis: "A requisi\xE7\xE3o nem completou (rede, CORS ou URL inv\xE1lida).",
+          preview: String(error.message || error)
+        });
+      }
+    }
+    return report;
+  }
   async function loadEmployees() {
-    const result = await withFallback(
+    const result = await readOrDemo(
       async () => {
         const response = await http.get({ action: "list" });
         return { items: extractList(response).map(EmployeeMapper.toModel) };
@@ -3955,7 +4014,7 @@ tbody tr:hover { background: var(--surface-2); }
   }
   async function createEmployee(data) {
     const payload = EmployeeMapper.toPayload({ ...data, atualizadoEm: (/* @__PURE__ */ new Date()).toISOString() });
-    return withFallback(
+    return mutate(
       () => http.post("create", { data: payload, ...payload }),
       async () => {
         const created = { ...data, id: uid("emp") };
@@ -3966,7 +4025,7 @@ tbody tr:hover { background: var(--surface-2); }
   }
   async function updateEmployee(data) {
     const payload = EmployeeMapper.toPayload({ ...data, atualizadoEm: (/* @__PURE__ */ new Date()).toISOString() });
-    return withFallback(
+    return mutate(
       () => http.post("update", { id: payload.id, data: payload, ...payload }),
       async () => {
         const index = Demo.employees.findIndex((e) => String(e.id) === String(data.id));
@@ -3976,7 +4035,7 @@ tbody tr:hover { background: var(--surface-2); }
     );
   }
   async function deleteEmployee(id) {
-    return withFallback(
+    return mutate(
       () => http.post("delete", { id }),
       async () => {
         Demo.employees = Demo.employees.filter((e) => String(e.id) !== String(id));
@@ -3986,7 +4045,7 @@ tbody tr:hover { background: var(--surface-2); }
   }
   async function updateStatus(id, status, extra = {}) {
     const payload = { id, status, ...extra, atualizadoEm: (/* @__PURE__ */ new Date()).toISOString() };
-    return withFallback(
+    return mutate(
       () => http.post("status", payload),
       async () => {
         const index = Demo.employees.findIndex((e) => String(e.id) === String(id));
@@ -3996,7 +4055,7 @@ tbody tr:hover { background: var(--surface-2); }
     );
   }
   async function loadAnnouncements() {
-    return withFallback(
+    return readOrDemo(
       async () => {
         const response = await http.get({ action: "announcements" });
         return { items: extractList(response).map(AnnouncementMapper.toModel) };
@@ -4006,7 +4065,7 @@ tbody tr:hover { background: var(--surface-2); }
   }
   async function createAnnouncement(data) {
     const payload = AnnouncementMapper.toPayload({ ...data, data: data.data || (/* @__PURE__ */ new Date()).toISOString() });
-    return withFallback(
+    return mutate(
       () => http.post("createAnnouncement", { data: payload, ...payload }),
       async () => {
         const created = { ...payload, id: uid("com") };
@@ -4017,7 +4076,7 @@ tbody tr:hover { background: var(--surface-2); }
   }
   async function updateAnnouncement(data) {
     const payload = AnnouncementMapper.toPayload(data);
-    return withFallback(
+    return mutate(
       () => http.post("updateAnnouncement", { id: payload.id, data: payload, ...payload }),
       async () => {
         const index = Demo.announcements.findIndex((a) => String(a.id) === String(data.id));
@@ -4027,7 +4086,7 @@ tbody tr:hover { background: var(--surface-2); }
     );
   }
   async function deleteAnnouncement(id) {
-    return withFallback(
+    return mutate(
       () => http.post("deleteAnnouncement", { id }),
       async () => {
         Demo.announcements = Demo.announcements.filter((a) => String(a.id) !== String(id));
@@ -4848,7 +4907,8 @@ tbody tr:hover { background: var(--surface-2); }
   }
   function showDemoBanner() {
     const banner = $("#offlineBanner");
-    banner.querySelector(".banner__text").textContent = "Modo demonstra\xE7\xE3o: o endpoint do Apps Script n\xE3o respondeu, ent\xE3o o sistema est\xE1 usando dados de exemplo. As altera\xE7\xF5es n\xE3o v\xE3o para a planilha.";
+    banner.querySelector(".banner__text").textContent = "MODO DEMONSTRA\xC7\xC3O \u2014 o Apps Script n\xE3o respondeu. Os dados na tela s\xE3o de exemplo e NADA est\xE1 sendo gravado na planilha.";
+    banner.querySelector("#bannerRetry").textContent = "Testar conex\xE3o";
     banner.classList.add("is-visible");
   }
   function render() {
@@ -4902,6 +4962,13 @@ tbody tr:hover { background: var(--surface-2); }
     $("#headerSubtitle").textContent = subtitle;
     document.body.classList.remove("nav-open");
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function notifySaved(result, message) {
+    if (result && result.__demo) {
+      Toast.warning("Modo demonstra\xE7\xE3o: N\xC3O foi gravado na planilha. Confira a conex\xE3o em Administra\xE7\xE3o \u203A Testar conex\xE3o.");
+    } else {
+      Toast.success(message);
+    }
   }
   var findEmployee = (id) => state.employees.find((employee) => String(employee.id) === String(id));
   function openDetails(id) {
@@ -4963,11 +5030,11 @@ tbody tr:hover { background: var(--surface-2); }
     const button = document.getElementById("saveEmployee");
     await runWithButton(button, async () => {
       if (editing) {
-        await updateEmployee({ ...previous, ...data });
-        Toast.success(`${data.nome} foi atualizado.`);
+        const result = await updateEmployee({ ...previous, ...data });
+        notifySaved(result, `${data.nome} foi atualizado na planilha.`);
       } else {
-        await createEmployee(data);
-        Toast.success(`${data.nome} entrou na lista da equipe.`);
+        const result = await createEmployee(data);
+        notifySaved(result, `${data.nome} foi gravado na planilha.`);
       }
       Modal.close();
       await sync({ silent: true });
@@ -4989,13 +5056,13 @@ tbody tr:hover { background: var(--surface-2); }
         container.querySelector("#saveStatus").addEventListener("click", async () => {
           const data = Modal.formData();
           await runWithButton(container.querySelector("#saveStatus"), async () => {
-            await updateStatus(data.id, data.status, {
+            const result = await updateStatus(data.id, data.status, {
               dataSaida: data.dataSaida,
               dataRetorno: data.dataRetorno,
               responsavel: data.responsavel,
               motivo: data.motivo
             });
-            Toast.success(`${employee.nome} agora est\xE1 como ${data.status}.`);
+            notifySaved(result, `${employee.nome} agora est\xE1 como ${data.status}.`);
             Modal.close();
             await sync({ silent: true });
           });
@@ -5012,8 +5079,8 @@ tbody tr:hover { background: var(--surface-2); }
     });
     if (!confirmed) return;
     try {
-      await deleteEmployee(id);
-      Toast.success(`${employee.nome} foi removido da equipe.`);
+      const result = await deleteEmployee(id);
+      notifySaved(result, `${employee.nome} foi removido da planilha.`);
       await sync({ silent: true });
     } catch (error) {
       Toast.error(friendlyMessage(error));
@@ -5040,11 +5107,11 @@ tbody tr:hover { background: var(--surface-2); }
           }
           await runWithButton(container.querySelector("#saveNotice"), async () => {
             if (editing) {
-              await updateAnnouncement({ ...announcement, ...data });
-              Toast.success("Comunicado atualizado.");
+              const result = await updateAnnouncement({ ...announcement, ...data });
+              notifySaved(result, "Comunicado atualizado na planilha.");
             } else {
-              await createAnnouncement(data);
-              Toast.success("Comunicado publicado para a equipe.");
+              const result = await createAnnouncement(data);
+              notifySaved(result, "Comunicado gravado na planilha.");
             }
             Modal.close();
             await sync({ silent: true });
@@ -5062,8 +5129,8 @@ tbody tr:hover { background: var(--surface-2); }
     });
     if (!confirmed) return;
     try {
-      await deleteAnnouncement(id);
-      Toast.success("Comunicado exclu\xEDdo.");
+      const result = await deleteAnnouncement(id);
+      notifySaved(result, "Comunicado exclu\xEDdo da planilha.");
       await sync({ silent: true });
     } catch (error) {
       Toast.error(friendlyMessage(error));
@@ -5195,6 +5262,56 @@ tbody tr:hover { background: var(--surface-2); }
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     return XLSX.utils.sheet_to_json(sheet, { defval: "" });
   }
+  async function openDiagnostics() {
+    Modal.open({
+      title: "Testar conex\xE3o com a planilha",
+      subtitle: "O que o Apps Script est\xE1 devolvendo agora",
+      size: "lg",
+      body: '<p class="muted">Consultando o endpoint\u2026</p>',
+      footer: '<button class="btn btn--ghost" data-close>Fechar</button><span class="spacer"></span><button class="btn btn--primary" id="rerun">Testar de novo</button>'
+    });
+    const paint = async () => {
+      const body = document.querySelector(".modal__body");
+      body.innerHTML = '<p class="muted">Consultando o endpoint\u2026</p>';
+      const report = await diagnose();
+      const ok = report.steps.every((step) => step.ok);
+      const steps = report.steps.map((step) => `
+      <div class="detail__item" style="border-left:3px solid ${step.ok ? "var(--success)" : "var(--danger)"}">
+        <span class="k">action=${escapeHtml(step.action)} \xB7 HTTP ${step.status} \xB7 ${escapeHtml(step.contentType)}</span>
+        <span class="v" style="color:${step.ok ? "var(--success)" : "var(--danger)"}">${escapeHtml(step.diagnosis)}</span>
+        <pre style="margin-top:8px;font-size:11px;white-space:pre-wrap;word-break:break-all;color:var(--text-mute);max-height:110px;overflow:auto">${escapeHtml(step.preview)}</pre>
+      </div>`).join("");
+      body.innerHTML = `
+      <div class="detail__section">
+        <span class="eyebrow">Endpoint configurado</span>
+        <div class="note-box" style="font-size:11.5px;word-break:break-all">${escapeHtml(report.endpoint)}</div>
+      </div>
+
+      <div class="detail__section">
+        <span class="eyebrow">Resultado</span>
+        <div class="note-box" style="border-left:3px solid ${ok ? "var(--success)" : "var(--danger)"}">
+          ${ok ? "<strong>Conex\xE3o saud\xE1vel.</strong> As grava\xE7\xF5es est\xE3o indo para a planilha." : "<strong>A planilha n\xE3o est\xE1 respondendo como deveria.</strong> Enquanto isso, nada do que voc\xEA cadastrar \xE9 salvo."}
+        </div>
+      </div>
+
+      <div class="detail__section">
+        <span class="eyebrow">Detalhes por a\xE7\xE3o</span>
+        <div style="display:grid;gap:12px">${steps}</div>
+      </div>
+
+      ${ok ? "" : `
+      <div class="detail__section">
+        <span class="eyebrow">Checklist</span>
+        <div class="note-box">1. O <strong>Codigo.gs</strong> foi colado no Apps Script da planilha?
+2. A fun\xE7\xE3o <strong>setup()</strong> foi executada uma vez (cria as abas)?
+3. A implanta\xE7\xE3o est\xE1 como <strong>Executar como: Eu</strong> e <strong>Quem pode acessar: Qualquer pessoa</strong>?
+4. Depois de qualquer edi\xE7\xE3o no Codigo.gs voc\xEA publicou uma <strong>NOVA VERS\xC3O</strong> da implanta\xE7\xE3o?
+5. A URL termina em <strong>/exec</strong> (e n\xE3o em /dev)?</div>
+      </div>`}`;
+    };
+    document.getElementById("rerun").addEventListener("click", paint);
+    paint();
+  }
   async function runWithButton(button, task) {
     if (!button) return task();
     const original = button.innerHTML;
@@ -5276,6 +5393,7 @@ tbody tr:hover { background: var(--surface-2); }
       if (action === "export-pdf") exportPDF();
       if (action === "import") $("#importInput").click();
       if (action === "refresh") sync();
+      if (action === "diagnose") openDiagnostics();
     });
     $("#employeeGrid").addEventListener("click", (event) => {
       if (event.target.closest("button") || event.target.closest("a")) return;
@@ -5287,7 +5405,7 @@ tbody tr:hover { background: var(--surface-2); }
       if (file) importFile(file);
       event.target.value = "";
     });
-    $("#bannerRetry").addEventListener("click", () => sync());
+    $("#bannerRetry").addEventListener("click", () => isDemoMode() ? openDiagnostics() : sync());
     setInterval(() => {
       if (!document.hidden) sync({ silent: true });
     }, CONFIG.pollInterval);
