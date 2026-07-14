@@ -1977,7 +1977,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
             </div>
           </div>
 
-          <div class="filters" style="padding:var(--sp-3) var(--sp-4)">
+          <div class="filters hidden" id="areaFilters" style="padding:var(--sp-3) var(--sp-4)">
             <div class="chips" id="areaChips"></div>
           </div>
 
@@ -4187,6 +4187,15 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
         body: JSON.stringify({ action, ...payload })
       });
     }
+    /**
+     * POST de um registro.
+     * O envelope leva os campos no topo (compatibilidade) E o objeto em `record`.
+     * `record` é um nome que nunca colide com um campo do modelo — ao contrário de `data`,
+     * que é o nome do campo de data dos comunicados e sobrescrevia o envelope.
+     */
+    postRecord(action, record) {
+      return this.post(action, { ...record, id: record.id || "", record, data: record });
+    }
     /** Requisição crua, sem retry nem parse — usada pelo diagnóstico. */
     async raw(params) {
       const url = `${this.config.endpoint}?${new URLSearchParams(params)}`;
@@ -4350,7 +4359,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   async function createEmployee(data) {
     const payload = EmployeeMapper.toPayload({ ...data, atualizadoEm: (/* @__PURE__ */ new Date()).toISOString() });
     return mutate(
-      () => http.post("create", { data: payload, ...payload }),
+      () => http.postRecord("create", payload),
       async () => {
         const created = { ...data, id: uid("emp") };
         Demo.employees.unshift(created);
@@ -4361,7 +4370,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   async function updateEmployee(data) {
     const payload = EmployeeMapper.toPayload({ ...data, atualizadoEm: (/* @__PURE__ */ new Date()).toISOString() });
     return mutate(
-      () => http.post("update", { id: payload.id, data: payload, ...payload }),
+      () => http.postRecord("update", payload),
       async () => {
         const index = Demo.employees.findIndex((e) => String(e.id) === String(data.id));
         if (index >= 0) Demo.employees[index] = { ...Demo.employees[index], ...data };
@@ -4401,7 +4410,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   async function createAnnouncement(data) {
     const payload = AnnouncementMapper.toPayload({ ...data, data: data.data || (/* @__PURE__ */ new Date()).toISOString() });
     return mutate(
-      () => http.post("createAnnouncement", { data: payload, ...payload }),
+      () => http.postRecord("createAnnouncement", payload),
       async () => {
         const created = { ...payload, id: uid("com") };
         Demo.announcements.unshift(created);
@@ -4412,7 +4421,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   async function updateAnnouncement(data) {
     const payload = AnnouncementMapper.toPayload(data);
     return mutate(
-      () => http.post("updateAnnouncement", { id: payload.id, data: payload, ...payload }),
+      () => http.postRecord("updateAnnouncement", payload),
       async () => {
         const index = Demo.announcements.findIndex((a) => String(a.id) === String(data.id));
         if (index >= 0) Demo.announcements[index] = { ...Demo.announcements[index], ...payload };
@@ -5410,6 +5419,8 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     renderBirthdays($("#birthdays"), state.employees);
     const filtered = sortEmployees(applyFilters(state.employees, state.filters, slugify));
     renderEmployees(filtered);
+    const areas = areasInUse(state.announcements);
+    $("#areaFilters").classList.toggle("hidden", !areas.length);
     renderAreaChips($("#areaChips"), state.announcements, state.noticeArea);
     renderNotices($("#noticeGrid"), filterNotices(state.announcements, state.noticeArea), true);
     renderAdminTable();
