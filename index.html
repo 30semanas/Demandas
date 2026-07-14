@@ -1324,6 +1324,294 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
 }
 
 /* ==========================================================================
+   Atalhos (acesso rápido)
+   ========================================================================== */
+.shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--sp-4);
+}
+
+.shortcut {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4) var(--sp-5);
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--base) var(--ease), box-shadow var(--base) var(--ease), border-color var(--base) var(--ease);
+  animation: fadeUp .45s var(--ease) backwards;
+  overflow: hidden;
+}
+.shortcut::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--status-color, var(--gray));
+  opacity: 0;
+  transition: opacity var(--base) var(--ease);
+}
+.shortcut:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--status-color, var(--secondary)) 40%, var(--border));
+}
+.shortcut:hover::before { opacity: 1; }
+
+/* Área clicável cobre o card inteiro; os botões de admin ficam acima dela */
+.shortcut__hit { position: absolute; inset: 0; z-index: 1; }
+
+.shortcut__icon {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  background: var(--status-soft, var(--surface-2));
+  color: var(--status-color, var(--text-soft));
+  flex: none;
+  overflow: hidden;
+}
+.shortcut__icon img {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  object-fit: contain;
+  z-index: 1;
+  background: var(--card);
+}
+.shortcut__fallback { display: grid; place-items: center; }
+
+.shortcut__body { min-width: 0; flex: 1; }
+.shortcut__title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: -.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shortcut__domain {
+  font-size: 11.5px;
+  color: var(--text-mute);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shortcut__desc {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.shortcut__go {
+  position: absolute;
+  right: var(--sp-4);
+  top: var(--sp-4);
+  color: var(--text-mute);
+  opacity: 0;
+  transform: translate(-4px, 4px);
+  transition: all var(--base) var(--ease);
+}
+.shortcut:hover .shortcut__go {
+  opacity: 1;
+  transform: translate(0, 0);
+  color: var(--status-color, var(--primary));
+}
+
+.shortcut__admin {
+  position: absolute;
+  right: var(--sp-3);
+  bottom: var(--sp-3);
+  display: flex;
+  gap: 2px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity var(--base) var(--ease);
+}
+.shortcut:hover .shortcut__admin { opacity: 1; }
+.shortcut__admin button {
+  padding: 5px;
+  border-radius: var(--r-sm);
+  color: var(--text-mute);
+  background: var(--card);
+  transition: all var(--fast) var(--ease);
+}
+.shortcut__admin button svg { width: 14px; height: 14px; stroke-width: 1.9; }
+.shortcut__admin button:hover { background: var(--surface-2); color: var(--primary); }
+
+@media (max-width: 720px) {
+  .shortcuts { grid-template-columns: 1fr; }
+  .shortcut__admin { opacity: 1; }
+}
+
+/* ==========================================================================
+   Comunicado automático de aniversário
+   ========================================================================== */
+.party {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-xl);
+  padding: var(--sp-6) var(--sp-5);
+  margin-bottom: var(--sp-5);
+  background:
+    radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--secondary) 22%, transparent), transparent 62%),
+    var(--card);
+  border: 1px solid color-mix(in srgb, var(--secondary) 38%, var(--border));
+  box-shadow: var(--shadow-md);
+  animation: fadeUp .6s var(--ease);
+  isolation: isolate;
+}
+
+.party__content { position: relative; z-index: 3; text-align: center; }
+
+.party__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--secondary);
+  margin-bottom: var(--sp-3);
+}
+.party__eyebrow svg { width: 13px; height: 13px; }
+
+.party__title {
+  font-size: 26px;
+  letter-spacing: -.03em;
+  margin-bottom: 4px;
+}
+.party__sub { font-size: 13px; color: var(--text-soft); margin-bottom: var(--sp-6); }
+
+.party__people {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--sp-6);
+}
+.party__person { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.party__person .avatar {
+  margin-bottom: var(--sp-3);
+  animation: bob 3.2s var(--ease) infinite;
+}
+.party__person:nth-child(2n) .avatar { animation-delay: .5s; }
+.party__person:nth-child(3n) .avatar { animation-delay: 1s; }
+
+.party__name { font-size: 15px; font-weight: 600; color: var(--primary); letter-spacing: -.02em; }
+.party__role { font-size: 12px; color: var(--text-soft); }
+.party__when { margin-top: 6px; }
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ---------- Confete ---------- */
+.confetti {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+.confetti__piece {
+  position: absolute;
+  top: -14px;
+  display: block;
+  opacity: 0;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes fall {
+  0% { opacity: 0; transform: translate3d(0, -14px, 0) rotate(0deg); }
+  8% { opacity: 1; }
+  85% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), 340px, 0) rotate(calc(var(--spin) * 720deg));
+  }
+}
+
+/* ---------- Fogos ---------- */
+.fireworks {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.firework {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  animation: burst 4.4s var(--ease) infinite;
+}
+.firework__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--fw);
+  animation: ring 4.4s var(--ease) infinite;
+  animation-delay: inherit;
+}
+.firework__spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--fw);
+  animation: spark 4.4s var(--ease) infinite;
+  animation-delay: inherit;
+}
+@keyframes burst {
+  0%, 100% { opacity: 0; }
+  4%, 16% { opacity: 1; }
+  30% { opacity: 0; }
+}
+@keyframes ring {
+  0% { transform: scale(.2); opacity: 0; }
+  6% { opacity: .9; }
+  30% { transform: scale(9); opacity: 0; }
+  100% { transform: scale(9); opacity: 0; }
+}
+@keyframes spark {
+  0% { transform: rotate(var(--angle)) translateX(0) scale(1); opacity: 0; }
+  6% { opacity: 1; }
+  28% { transform: rotate(var(--angle)) translateX(38px) scale(.3); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Quem pediu menos movimento recebe a festa parada — mas recebe a festa. */
+@media (prefers-reduced-motion: reduce) {
+  .confetti, .fireworks { display: none; }
+}
+
+@media (max-width: 720px) {
+  .party { padding: var(--sp-5) var(--sp-4); }
+  .party__title { font-size: 20px; }
+  .party__people { gap: var(--sp-4); }
+  .party__sub { margin-bottom: var(--sp-5); }
+}
+
+/* O comunicado fixado ocupa a largura toda da grade */
+.notices__pinned { grid-column: 1 / -1; }
+.notices__pinned .party { margin-bottom: 0; }
+
+/* ==========================================================================
    Inspire Presence — modal.css
    Overlay, painel, detalhes do colaborador, formulários, confirmação
    ========================================================================== */
@@ -1774,6 +2062,12 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
           <span class="nav__count" id="navCountNotices">0</span>
         </button>
 
+        <button class="nav__item" data-view="atalhos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+          Atalhos
+          <span class="nav__count" id="navCountLinks">0</span>
+        </button>
+
         <span class="nav__label">Gestão</span>
 
         <button class="nav__item" data-view="admin">
@@ -1861,6 +2155,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
 
         <!-- ========== Visão geral ========== -->
         <section class="view is-active" id="view-dashboard">
+          <div id="birthdayNotice"></div>
           <div id="highlight"></div>
           <div id="birthdays"></div>
           <div class="kpis" id="kpis"></div>
@@ -1984,6 +2279,28 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
           <div class="notices" id="noticeGrid"></div>
         </section>
 
+        <!-- ========== Atalhos ========== -->
+        <section class="view" id="view-atalhos">
+          <div class="section-head">
+            <div>
+              <h1>Atalhos</h1>
+              <p>Repositórios, sites, redes sociais, diretórios e sistemas — tudo a um clique.</p>
+            </div>
+            <div class="section-head__actions">
+              <button class="btn btn--primary" data-action="new-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                Adicionar atalho
+              </button>
+            </div>
+          </div>
+
+          <div class="filters" style="padding:var(--sp-3) var(--sp-4)">
+            <div class="chips" id="linkChips"></div>
+          </div>
+
+          <div class="shortcuts" id="linkGrid"></div>
+        </section>
+
         <!-- ========== Administração ========== -->
         <section class="view" id="view-admin">
           <div class="section-head">
@@ -2016,6 +2333,14 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
               </span>
               <h3>Importar do Excel</h3>
               <p>Suba uma planilha .xlsx ou .csv com a equipe.</p>
+            </button>
+
+            <button class="admin-card" data-action="new-link">
+              <span class="admin-card__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+              </span>
+              <h3>Adicionar atalho</h3>
+              <p>Links de acesso rápido para toda a equipe.</p>
             </button>
 
             <button class="admin-card" data-action="diagnose">
@@ -2125,6 +2450,35 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   function isAbsent(employee) {
     return !statusMeta(employee.status).present;
   }
+  var LINK_CATEGORIES = Object.freeze({
+    "Reposit\xF3rio": { color: "var(--primary)", soft: "var(--primary-soft)", icon: "code" },
+    "Site": { color: "var(--info)", soft: "var(--info-soft)", icon: "globe" },
+    "Rede social": { color: "var(--purple)", soft: "var(--purple-soft)", icon: "share" },
+    "Diret\xF3rio": { color: "var(--secondary)", soft: "var(--secondary-soft)", icon: "folder" },
+    "Sistema": { color: "var(--success)", soft: "var(--success-soft)", icon: "grid" },
+    "Documento": { color: "var(--warning)", soft: "var(--warning-soft)", icon: "book" },
+    "Outro": { color: "var(--text-mute)", soft: "var(--gray)", icon: "link" }
+  });
+  var LINK_CATEGORY_LIST = Object.keys(LINK_CATEGORIES);
+  function linkMeta(category) {
+    return LINK_CATEGORIES[category] || LINK_CATEGORIES["Outro"];
+  }
+  function normalizeUrl(url = "") {
+    const raw = String(url).trim();
+    if (!raw) return "";
+    return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  }
+  function domainOf(url = "") {
+    try {
+      return new URL(normalizeUrl(url)).hostname.replace(/^www\./, "");
+    } catch {
+      return String(url).replace(/^https?:\/\//i, "").split("/")[0];
+    }
+  }
+  function faviconOf(url = "") {
+    const domain = domainOf(url);
+    return domain ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64` : "";
+  }
   function escapeHtml(value) {
     if (value === null || value === void 0) return "";
     return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
@@ -2137,6 +2491,9 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   }
   function slugify(value = "") {
     return String(value).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+  function firstName(name = "") {
+    return String(name).trim().split(/\s+/)[0] || "";
   }
   function parseDate(value) {
     if (!value) return null;
@@ -2225,6 +2582,72 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       isThisMonth: date.getMonth() === today.getMonth(),
       daysUntil: Math.round((next - today) / 864e5),
       age: date.getFullYear() > 1900 ? today.getFullYear() - date.getFullYear() : null
+    };
+  }
+  function birthdayWindow(birthday, year) {
+    const date = new Date(year, birthday.getMonth(), birthday.getDate());
+    const weekday = date.getDay();
+    const start = new Date(date);
+    const end = new Date(date);
+    if (weekday === 6) {
+      start.setDate(start.getDate() - 1);
+      end.setDate(end.getDate() + 1);
+    } else if (weekday === 0) {
+      start.setDate(start.getDate() - 2);
+    }
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+    return { date, start, end, weekday };
+  }
+  function birthdaysInWindow(employees, now = /* @__PURE__ */ new Date()) {
+    const found = [];
+    employees.forEach((employee) => {
+      const birthday = parseDate(employee.aniversario);
+      if (!birthday) return;
+      for (const year of [now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1]) {
+        const window2 = birthdayWindow(birthday, year);
+        if (now >= window2.start && now <= window2.end) {
+          const today = new Date(now);
+          today.setHours(0, 0, 0, 0);
+          found.push({
+            employee,
+            date: window2.date,
+            isToday: window2.date.getTime() === today.getTime(),
+            weekday: window2.date.toLocaleDateString("pt-BR", { weekday: "long" }),
+            label: formatBirthday(window2.date),
+            end: window2.end
+          });
+          break;
+        }
+      }
+    });
+    return found.sort((a, b) => a.date - b.date);
+  }
+  function birthdayAnnouncement(employees, now = /* @__PURE__ */ new Date()) {
+    const people = birthdaysInWindow(employees, now);
+    if (!people.length) return null;
+    const nomes = people.map((item) => firstName(item.employee.nome));
+    const lista = nomes.length === 1 ? nomes[0] : `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
+    const todosHoje = people.every((item) => item.isToday);
+    const titulo = todosHoje ? people.length === 1 ? `Hoje \xE9 anivers\xE1rio de ${lista}!` : `Hoje \xE9 anivers\xE1rio de ${lista}!` : `Anivers\xE1rios do fim de semana: ${lista}`;
+    const mensagem = people.map((item) => {
+      const nome = item.employee.nome;
+      const cargo = item.employee.cargo ? ` \xB7 ${item.employee.cargo}` : "";
+      const quando = item.isToday ? "hoje" : `${item.weekday}, ${item.label}`;
+      return `${nome}${cargo} \u2014 ${quando}`;
+    }).join("\n");
+    return {
+      id: "auto_aniversario",
+      titulo,
+      mensagem: `${mensagem}
+
+Passe na mesa, mande uma mensagem, fa\xE7a barulho. \u{1F382}`,
+      autor: "Inspire Presence",
+      data: (/* @__PURE__ */ new Date()).toISOString(),
+      prioridade: "Alta",
+      areas: [],
+      auto: true,
+      people
     };
   }
   function birthdaysOfMonth(employees) {
@@ -3644,6 +4067,294 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
 }
 
 /* ==========================================================================
+   Atalhos (acesso rápido)
+   ========================================================================== */
+.shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--sp-4);
+}
+
+.shortcut {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4) var(--sp-5);
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--base) var(--ease), box-shadow var(--base) var(--ease), border-color var(--base) var(--ease);
+  animation: fadeUp .45s var(--ease) backwards;
+  overflow: hidden;
+}
+.shortcut::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--status-color, var(--gray));
+  opacity: 0;
+  transition: opacity var(--base) var(--ease);
+}
+.shortcut:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--status-color, var(--secondary)) 40%, var(--border));
+}
+.shortcut:hover::before { opacity: 1; }
+
+/* Área clicável cobre o card inteiro; os botões de admin ficam acima dela */
+.shortcut__hit { position: absolute; inset: 0; z-index: 1; }
+
+.shortcut__icon {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  background: var(--status-soft, var(--surface-2));
+  color: var(--status-color, var(--text-soft));
+  flex: none;
+  overflow: hidden;
+}
+.shortcut__icon img {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  object-fit: contain;
+  z-index: 1;
+  background: var(--card);
+}
+.shortcut__fallback { display: grid; place-items: center; }
+
+.shortcut__body { min-width: 0; flex: 1; }
+.shortcut__title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: -.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shortcut__domain {
+  font-size: 11.5px;
+  color: var(--text-mute);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shortcut__desc {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.shortcut__go {
+  position: absolute;
+  right: var(--sp-4);
+  top: var(--sp-4);
+  color: var(--text-mute);
+  opacity: 0;
+  transform: translate(-4px, 4px);
+  transition: all var(--base) var(--ease);
+}
+.shortcut:hover .shortcut__go {
+  opacity: 1;
+  transform: translate(0, 0);
+  color: var(--status-color, var(--primary));
+}
+
+.shortcut__admin {
+  position: absolute;
+  right: var(--sp-3);
+  bottom: var(--sp-3);
+  display: flex;
+  gap: 2px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity var(--base) var(--ease);
+}
+.shortcut:hover .shortcut__admin { opacity: 1; }
+.shortcut__admin button {
+  padding: 5px;
+  border-radius: var(--r-sm);
+  color: var(--text-mute);
+  background: var(--card);
+  transition: all var(--fast) var(--ease);
+}
+.shortcut__admin button svg { width: 14px; height: 14px; stroke-width: 1.9; }
+.shortcut__admin button:hover { background: var(--surface-2); color: var(--primary); }
+
+@media (max-width: 720px) {
+  .shortcuts { grid-template-columns: 1fr; }
+  .shortcut__admin { opacity: 1; }
+}
+
+/* ==========================================================================
+   Comunicado automático de aniversário
+   ========================================================================== */
+.party {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-xl);
+  padding: var(--sp-6) var(--sp-5);
+  margin-bottom: var(--sp-5);
+  background:
+    radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--secondary) 22%, transparent), transparent 62%),
+    var(--card);
+  border: 1px solid color-mix(in srgb, var(--secondary) 38%, var(--border));
+  box-shadow: var(--shadow-md);
+  animation: fadeUp .6s var(--ease);
+  isolation: isolate;
+}
+
+.party__content { position: relative; z-index: 3; text-align: center; }
+
+.party__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--secondary);
+  margin-bottom: var(--sp-3);
+}
+.party__eyebrow svg { width: 13px; height: 13px; }
+
+.party__title {
+  font-size: 26px;
+  letter-spacing: -.03em;
+  margin-bottom: 4px;
+}
+.party__sub { font-size: 13px; color: var(--text-soft); margin-bottom: var(--sp-6); }
+
+.party__people {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--sp-6);
+}
+.party__person { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.party__person .avatar {
+  margin-bottom: var(--sp-3);
+  animation: bob 3.2s var(--ease) infinite;
+}
+.party__person:nth-child(2n) .avatar { animation-delay: .5s; }
+.party__person:nth-child(3n) .avatar { animation-delay: 1s; }
+
+.party__name { font-size: 15px; font-weight: 600; color: var(--primary); letter-spacing: -.02em; }
+.party__role { font-size: 12px; color: var(--text-soft); }
+.party__when { margin-top: 6px; }
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ---------- Confete ---------- */
+.confetti {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+.confetti__piece {
+  position: absolute;
+  top: -14px;
+  display: block;
+  opacity: 0;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes fall {
+  0% { opacity: 0; transform: translate3d(0, -14px, 0) rotate(0deg); }
+  8% { opacity: 1; }
+  85% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), 340px, 0) rotate(calc(var(--spin) * 720deg));
+  }
+}
+
+/* ---------- Fogos ---------- */
+.fireworks {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.firework {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  animation: burst 4.4s var(--ease) infinite;
+}
+.firework__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--fw);
+  animation: ring 4.4s var(--ease) infinite;
+  animation-delay: inherit;
+}
+.firework__spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--fw);
+  animation: spark 4.4s var(--ease) infinite;
+  animation-delay: inherit;
+}
+@keyframes burst {
+  0%, 100% { opacity: 0; }
+  4%, 16% { opacity: 1; }
+  30% { opacity: 0; }
+}
+@keyframes ring {
+  0% { transform: scale(.2); opacity: 0; }
+  6% { opacity: .9; }
+  30% { transform: scale(9); opacity: 0; }
+  100% { transform: scale(9); opacity: 0; }
+}
+@keyframes spark {
+  0% { transform: rotate(var(--angle)) translateX(0) scale(1); opacity: 0; }
+  6% { opacity: 1; }
+  28% { transform: rotate(var(--angle)) translateX(38px) scale(.3); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Quem pediu menos movimento recebe a festa parada — mas recebe a festa. */
+@media (prefers-reduced-motion: reduce) {
+  .confetti, .fireworks { display: none; }
+}
+
+@media (max-width: 720px) {
+  .party { padding: var(--sp-5) var(--sp-4); }
+  .party__title { font-size: 20px; }
+  .party__people { gap: var(--sp-4); }
+  .party__sub { margin-bottom: var(--sp-5); }
+}
+
+/* O comunicado fixado ocupa a largura toda da grade */
+.notices__pinned { grid-column: 1 / -1; }
+.notices__pinned .party { margin-bottom: 0; }
+
+/* ==========================================================================
    Inspire Presence — modal.css
    Overlay, painel, detalhes do colaborador, formulários, confirmação
    ========================================================================== */
@@ -4167,6 +4878,21 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       };
     }
   };
+  var LinkMapper = {
+    toModel(row = {}) {
+      return {
+        id: String(pick(row, "id", "ID") || uid("lnk")),
+        titulo: String(pick(row, "titulo", "t\xEDtulo", "title", "nome")),
+        url: String(pick(row, "url", "link", "endereco", "endere\xE7o")),
+        descricao: String(pick(row, "descricao", "descri\xE7\xE3o", "description", "obs")),
+        categoria: String(pick(row, "categoria", "category", "tipo") || "Outro"),
+        ordem: Number(pick(row, "ordem", "order") || 0)
+      };
+    },
+    toPayload(link) {
+      return { ...link };
+    }
+  };
   var HttpClient = class {
     constructor(config) {
       this.config = config;
@@ -4259,6 +4985,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     active: false,
     employees: [],
     announcements: [],
+    links: [],
     seed() {
       const iso = (offsetDays) => {
         const d = /* @__PURE__ */ new Date();
@@ -4278,6 +5005,14 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
         { id: "10", aniversario: "1999-07-09", nome: "Lucas Ribeiro", cargo: "Assistente Administrativo", departamento: "Administrativo", equipe: "Opera\xE7\xF5es", gestor: "Sandra Reis", telefone: "(11) 98776-2244", email: "lucas.ribeiro@inspire.com.br", foto: "", status: "Banco de Horas", dataSaida: iso(0), dataRetorno: iso(0), responsavel: "Lucas Ribeiro", motivo: "Compensa\xE7\xE3o de horas", dataAdmissao: "2023-10-16", observacoes: "", historico: [] },
         { id: "11", aniversario: "1992-12-04", nome: "Fernanda Costa", cargo: "Revisora", departamento: "Editorial", equipe: "Revis\xE3o", gestor: "Carlos Eduardo Lima", telefone: "(11) 99332-5518", email: "fernanda.costa@inspire.com.br", foto: "", status: "Presencial", dataSaida: "", dataRetorno: "", responsavel: "", motivo: "", dataAdmissao: "2022-02-07", observacoes: "", historico: [] },
         { id: "12", aniversario: "1996-02-17", nome: "Thiago Barbosa", cargo: "Ilustrador", departamento: "Cria\xE7\xE3o", equipe: "Infantil", gestor: "Juliana Prado", telefone: "(11) 98009-4432", email: "thiago.barbosa@inspire.com.br", foto: "", status: "Folga", dataSaida: iso(0), dataRetorno: iso(1), responsavel: "Rafael Nogueira", motivo: "Folga por feriado trabalhado", dataAdmissao: "2024-04-22", observacoes: "", historico: [] }
+      ];
+      this.links = [
+        { id: "l1", titulo: "Site institucional", url: "https://lojainspire.com.br", descricao: "Loja e cat\xE1logo p\xFAblico da editora.", categoria: "Site", ordem: 1 },
+        { id: "l2", titulo: "Reposit\xF3rio do sistema", url: "https://github.com", descricao: "C\xF3digo do Inspire Presence no GitHub.", categoria: "Reposit\xF3rio", ordem: 2 },
+        { id: "l3", titulo: "Drive da equipe", url: "https://drive.google.com", descricao: "Contratos, capas aprovadas e originais.", categoria: "Diret\xF3rio", ordem: 3 },
+        { id: "l4", titulo: "Instagram", url: "https://instagram.com", descricao: "Perfil oficial da Editora Inspire.", categoria: "Rede social", ordem: 4 },
+        { id: "l5", titulo: "Planilha de presen\xE7a", url: "https://docs.google.com/spreadsheets", descricao: "Banco de dados deste painel.", categoria: "Sistema", ordem: 5 },
+        { id: "l6", titulo: "Manual de identidade", url: "https://drive.google.com", descricao: "Cores, tipografia e uso do logo.", categoria: "Documento", ordem: 6 }
       ];
       this.announcements = [
         { id: "a1", titulo: "Bienal do Livro \u2014 escala da equipe", mensagem: "A escala do estande j\xE1 est\xE1 fechada. Quem for para S\xE3o Paulo, retire o crach\xE1 com a Juliana at\xE9 quinta-feira.", autor: "Juliana Prado", data: iso(-1), prioridade: "Alta" },
@@ -4438,6 +5173,46 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       }
     );
   }
+  async function loadLinks() {
+    return readOrDemo(
+      async () => {
+        const response = await http.get({ action: "links" });
+        return { items: extractList(response).map(LinkMapper.toModel) };
+      },
+      async () => ({ items: Demo.links.map(LinkMapper.toModel) })
+    );
+  }
+  async function createLink(data) {
+    const payload = LinkMapper.toPayload(data);
+    return mutate(
+      () => http.postRecord("createLink", payload),
+      async () => {
+        const created = { ...payload, id: uid("lnk") };
+        Demo.links.unshift(created);
+        return { success: true, data: created };
+      }
+    );
+  }
+  async function updateLink(data) {
+    const payload = LinkMapper.toPayload(data);
+    return mutate(
+      () => http.postRecord("updateLink", payload),
+      async () => {
+        const index = Demo.links.findIndex((link) => String(link.id) === String(data.id));
+        if (index >= 0) Demo.links[index] = { ...Demo.links[index], ...payload };
+        return { success: true };
+      }
+    );
+  }
+  async function deleteLink(id) {
+    return mutate(
+      () => http.post("deleteLink", { id }),
+      async () => {
+        Demo.links = Demo.links.filter((link) => String(link.id) !== String(id));
+        return { success: true };
+      }
+    );
+  }
   async function importEmployees(list) {
     const results = [];
     for (const item of list) {
@@ -4490,7 +5265,13 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
     filter: '<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',
     cake: '<path d="M12 2v3"/><path d="M4 12a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3H4z"/><path d="M4 15c1.5 0 1.5 1.5 3 1.5s1.5-1.5 3-1.5 1.5 1.5 3 1.5 1.5-1.5 3-1.5 1.5 1.5 3 1.5"/><path d="M4 19h16v2H4z"/>',
-    tag: '<path d="M3 3h7l11 11-7 7L3 10z"/><circle cx="7.5" cy="7.5" r="1.5"/>'
+    tag: '<path d="M3 3h7l11 11-7 7L3 10z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+    link: '<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18z"/>',
+    code: '<path d="m8 6-6 6 6 6"/><path d="m16 6 6 6-6 6"/>',
+    share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
+    folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+    external: '<path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>'
   };
   function icon(name, size = 20) {
     const path = PATHS[name] || PATHS.info;
@@ -4679,6 +5460,35 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       </div>
     </article>`;
   }
+  function linkCard(link, index = 0, admin = true) {
+    const meta = linkMeta(link.categoria);
+    const url = normalizeUrl(link.url);
+    const favicon = faviconOf(link.url);
+    return `
+    <article class="shortcut" style="--status-color:${meta.color};--status-soft:${meta.soft};animation-delay:${Math.min(index * 40, 320)}ms" data-id="${escapeHtml(link.id)}">
+      <a class="shortcut__hit" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" aria-label="Abrir ${escapeHtml(link.titulo)}"></a>
+
+      <div class="shortcut__icon">
+        ${favicon ? `<img src="${escapeHtml(favicon)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
+        <span class="shortcut__fallback">${icon(meta.icon, 18)}</span>
+      </div>
+
+      <div class="shortcut__body">
+        <div class="shortcut__title">${escapeHtml(link.titulo)}</div>
+        <div class="shortcut__domain">${escapeHtml(domainOf(link.url))}</div>
+        ${link.descricao ? `<p class="shortcut__desc">${escapeHtml(link.descricao)}</p>` : ""}
+        <span class="tag" style="--tag-color:${meta.color};--tag-soft:${meta.soft}">${escapeHtml(link.categoria)}</span>
+      </div>
+
+      <span class="shortcut__go">${icon("external", 15)}</span>
+
+      ${admin ? `
+        <div class="shortcut__admin">
+          <button data-action="edit-link" data-id="${escapeHtml(link.id)}" title="Editar atalho">${icon("edit", 14)}</button>
+          <button data-action="delete-link" data-id="${escapeHtml(link.id)}" title="Excluir atalho">${icon("trash", 14)}</button>
+        </div>` : ""}
+    </article>`;
+  }
   function adminRow(employee) {
     const back = employee.dataRetorno ? formatDateShort(employee.dataRetorno) : "\u2014";
     return `
@@ -4705,6 +5515,83 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
         </div>
       </td>
     </tr>`;
+  }
+  var CONFETTI_COLORS = [
+    "var(--secondary)",
+    "#3FA55B",
+    "#4A7FB5",
+    "#E8A100",
+    "#D9534F",
+    "#7A6BC4",
+    "#0F2B46"
+  ];
+  function confetti(count = 34) {
+    let pieces = "";
+    for (let i = 0; i < count; i += 1) {
+      const left = Math.random() * 100;
+      const delay = (Math.random() * 4).toFixed(2);
+      const duration = (2.8 + Math.random() * 2.6).toFixed(2);
+      const drift = (Math.random() * 60 - 30).toFixed(0);
+      const size = 5 + Math.round(Math.random() * 5);
+      const color = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+      const round = Math.random() > 0.65 ? "border-radius:50%" : "";
+      const spin = Math.random() > 0.5 ? 1 : -1;
+      pieces += `<i class="confetti__piece" style="
+      left:${left}%;
+      width:${size}px;
+      height:${size + 3}px;
+      background:${color};
+      animation-delay:${delay}s;
+      animation-duration:${duration}s;
+      --drift:${drift}px;
+      --spin:${spin};
+      ${round}"></i>`;
+    }
+    return `<div class="confetti" aria-hidden="true">${pieces}</div>`;
+  }
+  function fireworks() {
+    const bursts = [
+      { left: "14%", top: "26%", delay: "0s", color: "var(--secondary)" },
+      { left: "78%", top: "20%", delay: "1.1s", color: "#4A7FB5" },
+      { left: "46%", top: "12%", delay: "2.2s", color: "#D9534F" },
+      { left: "90%", top: "48%", delay: "3.1s", color: "#3FA55B" }
+    ];
+    return `<div class="fireworks" aria-hidden="true">
+    ${bursts.map((burst) => {
+      const sparks = Array.from({ length: 10 }, (_, index) => {
+        const angle = 360 / 10 * index;
+        return `<i class="firework__spark" style="--angle:${angle}deg"></i>`;
+      }).join("");
+      return `<span class="firework" style="left:${burst.left};top:${burst.top};animation-delay:${burst.delay};--fw:${burst.color}">
+        <span class="firework__ring"></span>${sparks}
+      </span>`;
+    }).join("")}
+  </div>`;
+  }
+  function birthdayNoticeCard(announcement) {
+    const people = announcement.people || [];
+    const faces = people.map((item) => `
+    <div class="party__person">
+      ${avatar(item.employee, "avatar--lg")}
+      <div class="party__name">${escapeHtml(item.employee.nome)}</div>
+      <div class="party__role">${escapeHtml(item.employee.cargo || "")}</div>
+      <div class="party__when">
+        ${item.isToday ? `<span class="badge badge--cake">${icon("cake", 13)} Hoje</span>` : `<span class="badge badge--cake">${escapeHtml(item.weekday)}, ${escapeHtml(item.label)}</span>`}
+      </div>
+    </div>`).join("");
+    return `
+    <article class="party">
+      ${confetti()}
+      ${fireworks()}
+
+      <div class="party__content">
+        <span class="eyebrow party__eyebrow">${icon("cake", 13)} Comunicado autom\xE1tico</span>
+        <h2 class="party__title">${escapeHtml(announcement.titulo)}</h2>
+        <p class="party__sub">Passe na mesa, mande uma mensagem, fa\xE7a barulho.</p>
+
+        <div class="party__people">${faces}</div>
+      </div>
+    </article>`;
   }
 
   // js/modal.js
@@ -5138,6 +6025,41 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     });
     sync2();
   }
+  function linkFormBody(link = {}) {
+    const value = (key) => escapeHtml(link[key] || "");
+    const options = LINK_CATEGORY_LIST.map((category) => `<option value="${category}" ${link.categoria === category ? "selected" : ""}>${category}</option>`).join("");
+    return `
+    <form class="form-grid" id="linkForm" novalidate>
+      <input type="hidden" name="id" value="${value("id")}">
+
+      <div class="field span-2">
+        <label class="field__label" for="l-titulo">T\xEDtulo</label>
+        <input id="l-titulo" name="titulo" value="${value("titulo")}" placeholder="Ex.: Drive da equipe" required>
+      </div>
+
+      <div class="field span-2">
+        <label class="field__label" for="l-url">Endere\xE7o</label>
+        <input id="l-url" name="url" value="${value("url")}" placeholder="drive.google.com/\u2026" required>
+        <span class="field__hint">Pode colar sem o https:// \u2014 o sistema completa.</span>
+      </div>
+
+      <div class="field span-2">
+        <label class="field__label" for="l-desc">Descri\xE7\xE3o</label>
+        <input id="l-desc" name="descricao" value="${value("descricao")}" placeholder="Para que serve esse link?">
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="l-cat">Categoria</label>
+        <select id="l-cat" name="categoria">${options}</select>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="l-ordem">Ordem</label>
+        <input id="l-ordem" name="ordem" type="number" min="0" value="${escapeHtml(link.ordem ?? 0)}">
+        <span class="field__hint">Menor n\xFAmero aparece primeiro.</span>
+      </div>
+    </form>`;
+  }
 
   // js/dashboard.js
   var KPI_ORDER = ["Presencial", "Home Office", "F\xE9rias", "Viagem", "Treinamento", "Afastado"];
@@ -5335,8 +6257,8 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       </div>
     </div>`;
   }
-  function renderNotices(container, announcements, admin = false) {
-    if (!announcements.length) {
+  function renderNotices(container, announcements, admin = false, pinned = null) {
+    if (!announcements.length && !pinned) {
       container.innerHTML = `
       <div class="empty">
         <div class="empty__icon">${icon("megaphone", 24)}</div>
@@ -5352,19 +6274,59 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       if (byPriority !== 0) return byPriority;
       return new Date(b.data) - new Date(a.data);
     });
-    container.innerHTML = ordered.map((announcement, index) => noticeCard(announcement, index, admin)).join("");
+    const pinnedHtml = pinned ? `<div class="notices__pinned">${birthdayNoticeCard(pinned)}</div>` : "";
+    container.innerHTML = pinnedHtml + ordered.map((announcement, index) => noticeCard(announcement, index, admin)).join("");
   }
   function filterNotices(announcements, area) {
     if (!area) return announcements;
     return announcements.filter((item) => (item.areas || []).includes(area));
+  }
+  function renderLinkChips(container, links, activeCategory = "") {
+    const used = LINK_CATEGORY_LIST.filter(
+      (category) => links.some((link) => link.categoria === category)
+    );
+    container.innerHTML = `
+    <button class="chip ${activeCategory ? "" : "is-active"}" data-category=""
+            style="--status-color:var(--primary);--status-soft:var(--primary-soft)">
+      <span class="chip__dot"></span>Todos <span class="chip__count">${links.length}</span>
+    </button>
+    ${used.map((category) => {
+      const meta = linkMeta(category);
+      const count = links.filter((link) => link.categoria === category).length;
+      return `
+        <button class="chip ${activeCategory === category ? "is-active" : ""}" data-category="${escapeHtml(category)}"
+                style="--status-color:${meta.color};--status-soft:${meta.soft}">
+          <span class="chip__dot"></span>${escapeHtml(category)} <span class="chip__count">${count}</span>
+        </button>`;
+    }).join("")}`;
+  }
+  function renderLinks(container, links, activeCategory = "") {
+    const filtered = activeCategory ? links.filter((link) => link.categoria === activeCategory) : links;
+    if (!filtered.length) {
+      container.innerHTML = `
+      <div class="empty">
+        <div class="empty__icon">${icon("link", 24)}</div>
+        <h3>${links.length ? "Nenhum atalho nessa categoria" : "Nenhum atalho cadastrado"}</h3>
+        <p>${links.length ? "Escolha outra categoria para ver o restante." : "Re\xFAna aqui os links que a equipe abre todo dia: reposit\xF3rios, drives, redes sociais, sistemas."}</p>
+        <button class="btn btn--primary" data-action="new-link">${icon("plus", 16)} Adicionar atalho</button>
+      </div>`;
+      return;
+    }
+    const ordered = [...filtered].sort((a, b) => {
+      if ((a.ordem || 0) !== (b.ordem || 0)) return (a.ordem || 0) - (b.ordem || 0);
+      return a.titulo.localeCompare(b.titulo, "pt-BR");
+    });
+    container.innerHTML = ordered.map((link, index) => linkCard(link, index)).join("");
   }
 
   // js/app.js
   var state = {
     employees: [],
     announcements: [],
+    links: [],
     filters: { search: "", status: "Todos", departamento: "", equipe: "", cargo: "", responsavel: "" },
     noticeArea: "",
+    linkCategory: "",
     view: "dashboard",
     layout: "grid",
     loading: false,
@@ -5380,12 +6342,14 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       $("#employeeGrid").innerHTML = skeletonCards(6);
     }
     try {
-      const [employeesResponse, announcementsResponse] = await Promise.all([
+      const [employeesResponse, announcementsResponse, linksResponse] = await Promise.all([
         loadEmployees(),
-        loadAnnouncements()
+        loadAnnouncements(),
+        loadLinks()
       ]);
       state.employees = employeesResponse.items;
       state.announcements = announcementsResponse.items;
+      state.links = linksResponse.items;
       state.lastSync = /* @__PURE__ */ new Date();
       render();
       SyncIndicator.set("ok", `Atualizado ${formatTime(state.lastSync)}`);
@@ -5412,18 +6376,29 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   }
   function render() {
     const stats = computeStats(state.employees);
+    const party = birthdayAnnouncement(state.employees);
+    $("#birthdayNotice").innerHTML = party ? birthdayNoticeCard(party) : "";
     renderKPIs($("#kpis"), stats, state.filters.status);
     renderChips($("#chips"), stats, state.filters.status);
     renderFilterSelects(state.employees, state.filters);
-    renderHighlight($("#highlight"), state.announcements);
+    renderHighlight($("#highlight"), party ? [] : state.announcements);
     renderBirthdays($("#birthdays"), state.employees);
     const filtered = sortEmployees(applyFilters(state.employees, state.filters, slugify));
     renderEmployees(filtered);
     const areas = areasInUse(state.announcements);
     $("#areaFilters").classList.toggle("hidden", !areas.length);
     renderAreaChips($("#areaChips"), state.announcements, state.noticeArea);
-    renderNotices($("#noticeGrid"), filterNotices(state.announcements, state.noticeArea), true);
+    renderNotices(
+      $("#noticeGrid"),
+      filterNotices(state.announcements, state.noticeArea),
+      true,
+      state.noticeArea ? null : party
+      // com filtro de área ativo, o automático sai da frente
+    );
+    renderLinkChips($("#linkChips"), state.links, state.linkCategory);
+    renderLinks($("#linkGrid"), state.links, state.linkCategory);
     renderAdminTable();
+    $("#navCountLinks").textContent = state.links.length;
     $("#dl-dept").innerHTML = [...new Set(state.employees.map((e) => e.departamento).filter(Boolean))].map((dept) => `<option value="${escapeHtml(dept)}">`).join("");
     $("#navCountTeam").textContent = stats.total;
     $("#navCountNotices").textContent = state.announcements.length;
@@ -5454,6 +6429,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     dashboard: ["Vis\xE3o geral", "Quem est\xE1 dispon\xEDvel para a equipe agora"],
     equipe: ["Equipe", "Todos os colaboradores e suas situa\xE7\xF5es"],
     comunicados: ["Comunicados", "Avisos internos publicados para o time"],
+    atalhos: ["Atalhos", "Os links que a equipe abre todo dia"],
     admin: ["Administra\xE7\xE3o", "Cadastros, status e substitutos"]
   };
   function goTo(view) {
@@ -5642,6 +6618,52 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     try {
       const result = await deleteAnnouncement(id);
       notifySaved(result, "Comunicado exclu\xEDdo da planilha.");
+      await sync({ silent: true });
+    } catch (error) {
+      Toast.error(friendlyMessage(error));
+    }
+  }
+  var findLink = (id) => state.links.find((link) => String(link.id) === String(id));
+  function openLinkForm(id = null) {
+    const link = id ? findLink(id) : {};
+    const editing = Boolean(id);
+    Modal.open({
+      title: editing ? "Editar atalho" : "Novo atalho",
+      subtitle: "Aparece para toda a equipe na aba Atalhos",
+      body: linkFormBody(link),
+      footer: `
+      <button class="btn btn--ghost" data-close>Cancelar</button>
+      <span class="spacer"></span>
+      <button class="btn btn--primary" id="saveLink">${icon("check", 15)} ${editing ? "Salvar atalho" : "Adicionar atalho"}</button>`,
+      onMount: (container) => {
+        container.querySelector("#saveLink").addEventListener("click", async () => {
+          const data = Modal.formData();
+          if (!data.titulo || !data.url) {
+            Toast.error("T\xEDtulo e endere\xE7o s\xE3o obrigat\xF3rios.");
+            return;
+          }
+          data.ordem = Number(data.ordem) || 0;
+          await runWithButton(container.querySelector("#saveLink"), async () => {
+            const result = editing ? await updateLink({ ...link, ...data }) : await createLink(data);
+            notifySaved(result, editing ? "Atalho atualizado." : "Atalho adicionado.");
+            Modal.close();
+            await sync({ silent: true });
+          });
+        });
+      }
+    });
+  }
+  async function removeLink(id) {
+    const link = findLink(id);
+    if (!link) return;
+    const confirmed = await Modal.confirm({
+      title: "Excluir atalho",
+      text: `O atalho <strong>${escapeHtml(link.titulo)}</strong> some da aba Atalhos.`
+    });
+    if (!confirmed) return;
+    try {
+      const result = await deleteLink(id);
+      notifySaved(result, "Atalho exclu\xEDdo.");
       await sync({ silent: true });
     } catch (error) {
       Toast.error(friendlyMessage(error));
@@ -5886,6 +6908,12 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       state.noticeArea = chip.dataset.area;
       render();
     });
+    $("#linkChips").addEventListener("click", (event) => {
+      const chip = event.target.closest(".chip");
+      if (!chip) return;
+      state.linkCategory = chip.dataset.category;
+      render();
+    });
     $$(".view-toggle button").forEach((button) => {
       button.addEventListener("click", () => {
         state.layout = button.dataset.layout;
@@ -5913,6 +6941,9 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       if (action === "import") $("#importInput").click();
       if (action === "refresh") sync();
       if (action === "diagnose") openDiagnostics();
+      if (action === "new-link") openLinkForm();
+      if (action === "edit-link") openLinkForm(id);
+      if (action === "delete-link") removeLink(id);
     });
     $("#employeeGrid").addEventListener("click", (event) => {
       if (event.target.closest("button") || event.target.closest("a")) return;
