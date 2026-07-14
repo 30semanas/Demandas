@@ -1895,6 +1895,101 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
 .confirm p strong { color: var(--primary); }
 
 /* ==========================================================================
+   Categorias de atalho
+   ========================================================================== */
+.link-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-mute);
+  margin-top: 2px;
+  transition: color var(--fast) var(--ease);
+}
+.link-btn:hover { color: var(--secondary); text-decoration: underline; }
+.link-btn svg { width: 12px; height: 12px; }
+
+.cat-list { display: flex; flex-direction: column; gap: 8px; }
+
+.cat-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 10px var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--card);
+  transition: border-color var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.cat-row:hover { border-color: var(--tag-color, var(--text-mute)); transform: translateX(2px); }
+
+.cat-row__icon {
+  width: 34px; height: 34px;
+  border-radius: var(--r-sm);
+  display: grid; place-items: center;
+  background: var(--tag-soft, var(--surface-2));
+  color: var(--tag-color, var(--text-soft));
+  flex: none;
+}
+.cat-row__body { flex: 1; min-width: 0; }
+.cat-row__name { font-size: 13.5px; font-weight: 500; color: var(--primary); }
+.cat-row__meta { font-size: 11.5px; color: var(--text-mute); }
+.cat-row__actions { display: flex; gap: 2px; flex: none; }
+.cat-row__actions button {
+  padding: 6px;
+  border-radius: var(--r-sm);
+  color: var(--text-mute);
+  transition: all var(--fast) var(--ease);
+}
+.cat-row__actions button svg { width: 14px; height: 14px; stroke-width: 1.9; }
+.cat-row__actions button:hover { background: var(--surface-2); color: var(--primary); }
+.cat-row__actions button.danger:hover { background: var(--danger-soft); color: var(--danger); }
+
+/* Seletor de cor */
+.swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+.swatch {
+  position: relative;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--sw);
+  cursor: pointer;
+  transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+  box-shadow: 0 0 0 0 var(--sw);
+}
+.swatch input { position: absolute; opacity: 0; pointer-events: none; }
+.swatch:hover { transform: scale(1.1); }
+.swatch.is-on {
+  box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--sw);
+  transform: scale(1.05);
+}
+
+/* Seletor de ícone */
+.icon-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 8px;
+}
+.icon-pick {
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text-mute);
+  cursor: pointer;
+  transition: all var(--fast) var(--ease);
+}
+.icon-pick input { position: absolute; opacity: 0; pointer-events: none; }
+.icon-pick:hover { border-color: var(--text-mute); color: var(--primary); }
+.icon-pick.is-on {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* ==========================================================================
    Inspire Presence — responsive.css
    Notebook · Tablet · Celular · Impressão (PDF)
    ========================================================================== */
@@ -2287,6 +2382,10 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
               <p>Repositórios, sites, redes sociais, diretórios e sistemas — tudo a um clique.</p>
             </div>
             <div class="section-head__actions">
+              <button class="btn btn--ghost" data-action="categories">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+                Categorias
+              </button>
               <button class="btn btn--primary" data-action="new-link">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
                 Adicionar atalho
@@ -2341,6 +2440,14 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
               </span>
               <h3>Adicionar atalho</h3>
               <p>Links de acesso rápido para toda a equipe.</p>
+            </button>
+
+            <button class="admin-card" data-action="categories">
+              <span class="admin-card__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3 3h7l11 11-7 7L3 10z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+              </span>
+              <h3>Categorias de atalho</h3>
+              <p>Crie, renomeie, troque a cor e o ícone.</p>
             </button>
 
             <button class="admin-card" data-action="diagnose">
@@ -2450,18 +2557,61 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   function isAbsent(employee) {
     return !statusMeta(employee.status).present;
   }
-  var LINK_CATEGORIES = Object.freeze({
-    "Reposit\xF3rio": { color: "var(--primary)", soft: "var(--primary-soft)", icon: "code" },
-    "Site": { color: "var(--info)", soft: "var(--info-soft)", icon: "globe" },
-    "Rede social": { color: "var(--purple)", soft: "var(--purple-soft)", icon: "share" },
-    "Diret\xF3rio": { color: "var(--secondary)", soft: "var(--secondary-soft)", icon: "folder" },
-    "Sistema": { color: "var(--success)", soft: "var(--success-soft)", icon: "grid" },
-    "Documento": { color: "var(--warning)", soft: "var(--warning-soft)", icon: "book" },
-    "Outro": { color: "var(--text-mute)", soft: "var(--gray)", icon: "link" }
-  });
-  var LINK_CATEGORY_LIST = Object.keys(LINK_CATEGORIES);
-  function linkMeta(category) {
-    return LINK_CATEGORIES[category] || LINK_CATEGORIES["Outro"];
+  var CATEGORY_COLORS = [
+    "#0F2B46",
+    "#4A7FB5",
+    "#7A6BC4",
+    "#D6B36A",
+    "#3FA55B",
+    "#E8A100",
+    "#D9534F",
+    "#9AA1AB"
+  ];
+  var CATEGORY_ICONS = [
+    "link",
+    "globe",
+    "code",
+    "share",
+    "folder",
+    "grid",
+    "book",
+    "building",
+    "users",
+    "calendar",
+    "image",
+    "megaphone",
+    "tag",
+    "star"
+  ];
+  var DEFAULT_CATEGORIES = [
+    { id: "cat_repositorio", nome: "Reposit\xF3rio", cor: "#0F2B46", icone: "code", ordem: 1 },
+    { id: "cat_site", nome: "Site", cor: "#4A7FB5", icone: "globe", ordem: 2 },
+    { id: "cat_social", nome: "Rede social", cor: "#7A6BC4", icone: "share", ordem: 3 },
+    { id: "cat_diretorio", nome: "Diret\xF3rio", cor: "#D6B36A", icone: "folder", ordem: 4 },
+    { id: "cat_sistema", nome: "Sistema", cor: "#3FA55B", icone: "grid", ordem: 5 },
+    { id: "cat_documento", nome: "Documento", cor: "#E8A100", icone: "book", ordem: 6 },
+    { id: "cat_outro", nome: "Outro", cor: "#9AA1AB", icone: "link", ordem: 7 }
+  ];
+  var CATEGORY_REGISTRY = [...DEFAULT_CATEGORIES];
+  function setCategories(list) {
+    CATEGORY_REGISTRY = list && list.length ? [...list] : [...DEFAULT_CATEGORIES];
+  }
+  function getCategories() {
+    return [...CATEGORY_REGISTRY].sort((a, b) => {
+      if ((a.ordem || 0) !== (b.ordem || 0)) return (a.ordem || 0) - (b.ordem || 0);
+      return String(a.nome).localeCompare(String(b.nome), "pt-BR");
+    });
+  }
+  var categoryNames = () => getCategories().map((category) => category.nome);
+  function softColor(hex) {
+    return `${hex}22`;
+  }
+  function linkMeta(name) {
+    const found = CATEGORY_REGISTRY.find(
+      (category2) => slugify(category2.nome) === slugify(name || "")
+    );
+    const category = found || { cor: "#9AA1AB", icone: "link" };
+    return { color: category.cor, soft: softColor(category.cor), icon: category.icone };
   }
   function normalizeUrl(url = "") {
     const raw = String(url).trim();
@@ -4638,6 +4788,101 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
 .confirm p strong { color: var(--primary); }
 
 /* ==========================================================================
+   Categorias de atalho
+   ========================================================================== */
+.link-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-mute);
+  margin-top: 2px;
+  transition: color var(--fast) var(--ease);
+}
+.link-btn:hover { color: var(--secondary); text-decoration: underline; }
+.link-btn svg { width: 12px; height: 12px; }
+
+.cat-list { display: flex; flex-direction: column; gap: 8px; }
+
+.cat-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 10px var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--card);
+  transition: border-color var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.cat-row:hover { border-color: var(--tag-color, var(--text-mute)); transform: translateX(2px); }
+
+.cat-row__icon {
+  width: 34px; height: 34px;
+  border-radius: var(--r-sm);
+  display: grid; place-items: center;
+  background: var(--tag-soft, var(--surface-2));
+  color: var(--tag-color, var(--text-soft));
+  flex: none;
+}
+.cat-row__body { flex: 1; min-width: 0; }
+.cat-row__name { font-size: 13.5px; font-weight: 500; color: var(--primary); }
+.cat-row__meta { font-size: 11.5px; color: var(--text-mute); }
+.cat-row__actions { display: flex; gap: 2px; flex: none; }
+.cat-row__actions button {
+  padding: 6px;
+  border-radius: var(--r-sm);
+  color: var(--text-mute);
+  transition: all var(--fast) var(--ease);
+}
+.cat-row__actions button svg { width: 14px; height: 14px; stroke-width: 1.9; }
+.cat-row__actions button:hover { background: var(--surface-2); color: var(--primary); }
+.cat-row__actions button.danger:hover { background: var(--danger-soft); color: var(--danger); }
+
+/* Seletor de cor */
+.swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+.swatch {
+  position: relative;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--sw);
+  cursor: pointer;
+  transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+  box-shadow: 0 0 0 0 var(--sw);
+}
+.swatch input { position: absolute; opacity: 0; pointer-events: none; }
+.swatch:hover { transform: scale(1.1); }
+.swatch.is-on {
+  box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--sw);
+  transform: scale(1.05);
+}
+
+/* Seletor de ícone */
+.icon-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 8px;
+}
+.icon-pick {
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text-mute);
+  cursor: pointer;
+  transition: all var(--fast) var(--ease);
+}
+.icon-pick input { position: absolute; opacity: 0; pointer-events: none; }
+.icon-pick:hover { border-color: var(--text-mute); color: var(--primary); }
+.icon-pick.is-on {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* ==========================================================================
    Inspire Presence — responsive.css
    Notebook · Tablet · Celular · Impressão (PDF)
    ========================================================================== */
@@ -4893,6 +5138,20 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       return { ...link };
     }
   };
+  var CategoryMapper = {
+    toModel(row = {}) {
+      return {
+        id: String(pick(row, "id", "ID") || uid("cat")),
+        nome: String(pick(row, "nome", "name", "categoria", "titulo")),
+        cor: String(pick(row, "cor", "color") || "#9AA1AB"),
+        icone: String(pick(row, "icone", "\xEDcone", "icon") || "link"),
+        ordem: Number(pick(row, "ordem", "order") || 0)
+      };
+    },
+    toPayload(category) {
+      return { ...category };
+    }
+  };
   var HttpClient = class {
     constructor(config) {
       this.config = config;
@@ -4986,6 +5245,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     employees: [],
     announcements: [],
     links: [],
+    categories: [],
     seed() {
       const iso = (offsetDays) => {
         const d = /* @__PURE__ */ new Date();
@@ -5006,6 +5266,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
         { id: "11", aniversario: "1992-12-04", nome: "Fernanda Costa", cargo: "Revisora", departamento: "Editorial", equipe: "Revis\xE3o", gestor: "Carlos Eduardo Lima", telefone: "(11) 99332-5518", email: "fernanda.costa@inspire.com.br", foto: "", status: "Presencial", dataSaida: "", dataRetorno: "", responsavel: "", motivo: "", dataAdmissao: "2022-02-07", observacoes: "", historico: [] },
         { id: "12", aniversario: "1996-02-17", nome: "Thiago Barbosa", cargo: "Ilustrador", departamento: "Cria\xE7\xE3o", equipe: "Infantil", gestor: "Juliana Prado", telefone: "(11) 98009-4432", email: "thiago.barbosa@inspire.com.br", foto: "", status: "Folga", dataSaida: iso(0), dataRetorno: iso(1), responsavel: "Rafael Nogueira", motivo: "Folga por feriado trabalhado", dataAdmissao: "2024-04-22", observacoes: "", historico: [] }
       ];
+      this.categories = DEFAULT_CATEGORIES.map((category) => ({ ...category }));
       this.links = [
         { id: "l1", titulo: "Site institucional", url: "https://lojainspire.com.br", descricao: "Loja e cat\xE1logo p\xFAblico da editora.", categoria: "Site", ordem: 1 },
         { id: "l2", titulo: "Reposit\xF3rio do sistema", url: "https://github.com", descricao: "C\xF3digo do Inspire Presence no GitHub.", categoria: "Reposit\xF3rio", ordem: 2 },
@@ -5045,6 +5306,18 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       throw error;
     }
   }
+  async function readOptional(realCall, demoCall, label) {
+    if (Demo.active) {
+      const result = await demoCall();
+      result.__demo = true;
+      return result;
+    }
+    try {
+      return await realCall();
+    } catch (error) {
+      return { items: [], __error: friendlyMessage(error), __label: label };
+    }
+  }
   async function mutate(realCall, demoCall) {
     if (Demo.active) {
       const result = await demoCall();
@@ -5055,7 +5328,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   }
   async function diagnose() {
     const report = { endpoint: CONFIG.endpoint, demo: Demo.active, steps: [] };
-    for (const action of ["ping", "list", "announcements"]) {
+    for (const action of ["ping", "list", "announcements", "links"]) {
       try {
         const raw = await http.raw({ action });
         const isJson = raw.text.trim().startsWith("{") || raw.text.trim().startsWith("[");
@@ -5134,12 +5407,13 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     );
   }
   async function loadAnnouncements() {
-    return readOrDemo(
+    return readOptional(
       async () => {
         const response = await http.get({ action: "announcements" });
         return { items: extractList(response).map(AnnouncementMapper.toModel) };
       },
-      async () => ({ items: Demo.announcements.map(AnnouncementMapper.toModel) })
+      async () => ({ items: Demo.announcements.map(AnnouncementMapper.toModel) }),
+      "Comunicados"
     );
   }
   async function createAnnouncement(data) {
@@ -5173,13 +5447,56 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       }
     );
   }
+  async function loadCategories() {
+    return readOptional(
+      async () => {
+        const response = await http.get({ action: "categories" });
+        const items = extractList(response).map(CategoryMapper.toModel).filter((item) => item.nome);
+        return { items: items.length ? items : DEFAULT_CATEGORIES };
+      },
+      async () => ({ items: Demo.categories }),
+      "Categorias"
+    );
+  }
+  async function createCategory(data) {
+    const payload = CategoryMapper.toPayload(data);
+    return mutate(
+      () => http.postRecord("createCategory", payload),
+      async () => {
+        const created = { ...payload, id: uid("cat") };
+        Demo.categories.push(created);
+        return { success: true, data: created };
+      }
+    );
+  }
+  async function updateCategory(data) {
+    const payload = CategoryMapper.toPayload(data);
+    return mutate(
+      () => http.postRecord("updateCategory", payload),
+      async () => {
+        const index = Demo.categories.findIndex((item) => String(item.id) === String(data.id));
+        if (index >= 0) Demo.categories[index] = { ...Demo.categories[index], ...payload };
+        return { success: true };
+      }
+    );
+  }
+  async function deleteCategory(id) {
+    return mutate(
+      () => http.post("deleteCategory", { id }),
+      async () => {
+        Demo.categories = Demo.categories.filter((item) => String(item.id) !== String(id));
+        return { success: true };
+      }
+    );
+  }
   async function loadLinks() {
-    return readOrDemo(
+    return readOptional(
       async () => {
         const response = await http.get({ action: "links" });
         return { items: extractList(response).map(LinkMapper.toModel) };
       },
-      async () => ({ items: Demo.links.map(LinkMapper.toModel) })
+      async () => ({ items: Demo.links.map(LinkMapper.toModel) }),
+      "Atalhos"
     );
   }
   async function createLink(data) {
@@ -5271,7 +5588,8 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     code: '<path d="m8 6-6 6 6 6"/><path d="m16 6 6 6-6 6"/>',
     share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
     folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
-    external: '<path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>'
+    external: '<path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>',
+    star: '<path d="m12 3 2.7 5.6 6.3.9-4.5 4.3 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.5l6.3-.9z"/>'
   };
   function icon(name, size = 20) {
     const path = PATHS[name] || PATHS.info;
@@ -6027,7 +6345,9 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   }
   function linkFormBody(link = {}) {
     const value = (key) => escapeHtml(link[key] || "");
-    const options = LINK_CATEGORY_LIST.map((category) => `<option value="${category}" ${link.categoria === category ? "selected" : ""}>${category}</option>`).join("");
+    const names = categoryNames();
+    const current = link.categoria || names[0] || "Outro";
+    const options = names.map((category) => `<option value="${escapeHtml(category)}" ${category === current ? "selected" : ""}>${escapeHtml(category)}</option>`).join("");
     return `
     <form class="form-grid" id="linkForm" novalidate>
       <input type="hidden" name="id" value="${value("id")}">
@@ -6051,6 +6371,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       <div class="field">
         <label class="field__label" for="l-cat">Categoria</label>
         <select id="l-cat" name="categoria">${options}</select>
+        <button type="button" class="link-btn" id="manageCategories">${icon("settings", 12)} Gerenciar categorias</button>
       </div>
 
       <div class="field">
@@ -6059,6 +6380,95 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
         <span class="field__hint">Menor n\xFAmero aparece primeiro.</span>
       </div>
     </form>`;
+  }
+  function categoriesBody(links = []) {
+    const categories = getCategories();
+    const usage = (name) => links.filter((link) => link.categoria === name).length;
+    const rows = categories.map((category) => {
+      const count = usage(category.nome);
+      return `
+      <div class="cat-row" data-id="${escapeHtml(category.id)}">
+        <span class="cat-row__icon" style="--tag-color:${escapeHtml(category.cor)};--tag-soft:${escapeHtml(softColor(category.cor))}">
+          ${icon(category.icone, 16)}
+        </span>
+        <div class="cat-row__body">
+          <div class="cat-row__name">${escapeHtml(category.nome)}</div>
+          <div class="cat-row__meta">${count} atalho${count === 1 ? "" : "s"}</div>
+        </div>
+        <div class="cat-row__actions">
+          <button data-cat-action="edit" data-id="${escapeHtml(category.id)}" title="Editar categoria">${icon("edit", 14)}</button>
+          <button class="danger" data-cat-action="delete" data-id="${escapeHtml(category.id)}" title="Excluir categoria">${icon("trash", 14)}</button>
+        </div>
+      </div>`;
+    }).join("");
+    return `
+    <div class="cat-list">
+      ${rows || '<p class="muted" style="font-size:13px">Nenhuma categoria cadastrada.</p>'}
+    </div>
+    <button class="btn btn--ghost btn--block" style="margin-top:16px" data-cat-action="new">
+      ${icon("plus", 15)} Nova categoria
+    </button>`;
+  }
+  function categoryFormBody(category = {}) {
+    const cor = category.cor || CATEGORY_COLORS[0];
+    const icone = category.icone || "link";
+    const swatches = CATEGORY_COLORS.map((color) => `
+    <label class="swatch ${color === cor ? "is-on" : ""}" style="--sw:${color}">
+      <input type="radio" name="cor" value="${color}" ${color === cor ? "checked" : ""}>
+    </label>`).join("");
+    const icons = CATEGORY_ICONS.map((name) => `
+    <label class="icon-pick ${name === icone ? "is-on" : ""}">
+      <input type="radio" name="icone" value="${name}" ${name === icone ? "checked" : ""}>
+      ${icon(name, 17)}
+    </label>`).join("");
+    return `
+    <form class="form-grid" id="categoryForm" novalidate>
+      <input type="hidden" name="id" value="${escapeHtml(category.id || "")}">
+
+      <div class="field span-2">
+        <label class="field__label" for="c-nome">Nome</label>
+        <input id="c-nome" name="nome" value="${escapeHtml(category.nome || "")}" placeholder="Ex.: Jur\xEDdico" required>
+      </div>
+
+      <div class="field span-2">
+        <span class="field__label">Cor</span>
+        <div class="swatches" id="swatches">${swatches}</div>
+      </div>
+
+      <div class="field span-2">
+        <span class="field__label">\xCDcone</span>
+        <div class="icon-picker" id="iconPicker">${icons}</div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="c-ordem">Ordem</label>
+        <input id="c-ordem" name="ordem" type="number" min="0" value="${escapeHtml(category.ordem ?? 0)}">
+        <span class="field__hint">Menor n\xFAmero aparece primeiro.</span>
+      </div>
+    </form>`;
+  }
+  function bindCategoryForm(container) {
+    const paint = (selector, className) => {
+      container.querySelectorAll(selector).forEach((label) => {
+        label.classList.toggle(className, label.querySelector("input").checked);
+      });
+    };
+    container.querySelector("#swatches")?.addEventListener("change", () => paint(".swatch", "is-on"));
+    container.querySelector("#iconPicker")?.addEventListener("change", () => paint(".icon-pick", "is-on"));
+  }
+  function categoryDeleteBody(category, count, others) {
+    const options = others.map((item) => `<option value="${escapeHtml(item.nome)}">${escapeHtml(item.nome)}</option>`).join("");
+    return `
+    <div class="confirm">
+      <div class="confirm__icon">${icon("alert", 24)}</div>
+      <h3>Excluir "${escapeHtml(category.nome)}"</h3>
+      <p>${count ? `<strong>${count}</strong> atalho${count === 1 ? "" : "s"} usa${count === 1 ? "" : "m"} essa categoria. Escolha para onde ${count === 1 ? "ele vai" : "eles v\xE3o"}.` : "Nenhum atalho usa essa categoria. Pode excluir com tranquilidade."}</p>
+    </div>
+    ${count ? `
+      <div class="field" style="margin-top:16px">
+        <label class="field__label" for="moveTo">Mover atalhos para</label>
+        <select id="moveTo" name="moveTo">${options}</select>
+      </div>` : ""}`;
   }
 
   // js/dashboard.js
@@ -6282,7 +6692,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     return announcements.filter((item) => (item.areas || []).includes(area));
   }
   function renderLinkChips(container, links, activeCategory = "") {
-    const used = LINK_CATEGORY_LIST.filter(
+    const used = categoryNames().filter(
       (category) => links.some((link) => link.categoria === category)
     );
     container.innerHTML = `
@@ -6324,6 +6734,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     employees: [],
     announcements: [],
     links: [],
+    categories: [],
     filters: { search: "", status: "Todos", departamento: "", equipe: "", cargo: "", responsavel: "" },
     noticeArea: "",
     linkCategory: "",
@@ -6342,19 +6753,29 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       $("#employeeGrid").innerHTML = skeletonCards(6);
     }
     try {
-      const [employeesResponse, announcementsResponse, linksResponse] = await Promise.all([
-        loadEmployees(),
+      const employeesResponse = await loadEmployees();
+      const [announcementsResponse, linksResponse, categoriesResponse] = await Promise.all([
         loadAnnouncements(),
-        loadLinks()
+        loadLinks(),
+        loadCategories()
       ]);
       state.employees = employeesResponse.items;
       state.announcements = announcementsResponse.items;
       state.links = linksResponse.items;
+      state.categories = categoriesResponse.items;
+      setCategories(state.categories);
       state.lastSync = /* @__PURE__ */ new Date();
       render();
       SyncIndicator.set("ok", `Atualizado ${formatTime(state.lastSync)}`);
       $("#offlineBanner").classList.remove("is-visible");
-      if (isDemoMode()) showDemoBanner();
+      if (isDemoMode()) {
+        showDemoBanner();
+      } else {
+        const falhas = [announcementsResponse, linksResponse, categoriesResponse].filter((response) => response.__error);
+        if (falhas.length) {
+          showPartialBanner(falhas.map((response) => response.__label).join(" e "));
+        }
+      }
     } catch (error) {
       SyncIndicator.set("error", "Sem sincronia");
       showOfflineBanner(friendlyMessage(error));
@@ -6366,6 +6787,12 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
   function showOfflineBanner(message) {
     const banner = $("#offlineBanner");
     banner.querySelector(".banner__text").textContent = message;
+    banner.classList.add("is-visible");
+  }
+  function showPartialBanner(abas) {
+    const banner = $("#offlineBanner");
+    banner.querySelector(".banner__text").textContent = `Conectado \xE0 planilha, mas a leitura de ${abas} falhou. Quase sempre \xE9 o Codigo.gs desatualizado: rode setup() e publique uma NOVA VERS\xC3O da implanta\xE7\xE3o.`;
+    banner.querySelector("#bannerRetry").textContent = "Testar conex\xE3o";
     banner.classList.add("is-visible");
   }
   function showDemoBanner() {
@@ -6636,6 +7063,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       <span class="spacer"></span>
       <button class="btn btn--primary" id="saveLink">${icon("check", 15)} ${editing ? "Salvar atalho" : "Adicionar atalho"}</button>`,
       onMount: (container) => {
+        container.querySelector("#manageCategories")?.addEventListener("click", () => openCategories());
         container.querySelector("#saveLink").addEventListener("click", async () => {
           const data = Modal.formData();
           if (!data.titulo || !data.url) {
@@ -6668,6 +7096,110 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
     } catch (error) {
       Toast.error(friendlyMessage(error));
     }
+  }
+  var findCategory = (id) => state.categories.find((category) => String(category.id) === String(id));
+  function openCategories() {
+    Modal.open({
+      title: "Categorias de atalho",
+      subtitle: "Nome, cor e \xEDcone de cada grupo",
+      body: categoriesBody(state.links),
+      footer: '<button class="btn btn--ghost btn--block" data-close>Fechar</button>',
+      onMount: (container) => {
+        container.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-cat-action]");
+          if (!button) return;
+          const { catAction, id } = button.dataset;
+          if (catAction === "new") openCategoryForm();
+          if (catAction === "edit") openCategoryForm(id);
+          if (catAction === "delete") removeCategory(id);
+        });
+      }
+    });
+  }
+  function openCategoryForm(id = null) {
+    const category = id ? findCategory(id) : {};
+    const editing = Boolean(id);
+    Modal.open({
+      title: editing ? "Editar categoria" : "Nova categoria",
+      size: "sm",
+      body: categoryFormBody(category),
+      footer: `
+      <button class="btn btn--ghost" data-close>Cancelar</button>
+      <span class="spacer"></span>
+      <button class="btn btn--primary" id="saveCategory">${icon("check", 15)} Salvar</button>`,
+      onMount: (container) => {
+        bindCategoryForm(container);
+        container.querySelector("#saveCategory").addEventListener("click", async () => {
+          const data = Modal.formData();
+          if (!data.nome) {
+            Toast.error("D\xEA um nome \xE0 categoria.");
+            return;
+          }
+          data.ordem = Number(data.ordem) || 0;
+          const duplicada = state.categories.some(
+            (item) => slugify(item.nome) === slugify(data.nome) && String(item.id) !== String(data.id)
+          );
+          if (duplicada) {
+            Toast.error("J\xE1 existe uma categoria com esse nome.");
+            return;
+          }
+          await runWithButton(container.querySelector("#saveCategory"), async () => {
+            if (editing) {
+              const result = await updateCategory({ ...category, ...data });
+              if (category.nome && category.nome !== data.nome) {
+                const afetados = state.links.filter((link) => link.categoria === category.nome);
+                for (const link of afetados) {
+                  await updateLink({ ...link, categoria: data.nome });
+                }
+                if (afetados.length) {
+                  Toast.info(`${afetados.length} atalho(s) migraram para "${data.nome}".`);
+                }
+              }
+              notifySaved(result, "Categoria atualizada.");
+            } else {
+              const result = await createCategory(data);
+              notifySaved(result, "Categoria criada.");
+            }
+            Modal.close();
+            await sync({ silent: true });
+            openCategories();
+          });
+        });
+      }
+    });
+  }
+  async function removeCategory(id) {
+    const category = findCategory(id);
+    if (!category) return;
+    const usados = state.links.filter((link) => link.categoria === category.nome);
+    const outras = state.categories.filter((item) => String(item.id) !== String(id));
+    if (!outras.length) {
+      Toast.error("Deixe ao menos uma categoria cadastrada.");
+      return;
+    }
+    Modal.open({
+      title: "Excluir categoria",
+      size: "sm",
+      body: categoryDeleteBody(category, usados.length, outras),
+      footer: `
+      <button class="btn btn--ghost btn--block" data-close>Cancelar</button>
+      <button class="btn btn--danger btn--block" id="confirmDeleteCat">Excluir</button>`,
+      onMount: (container) => {
+        container.querySelector("#confirmDeleteCat").addEventListener("click", async () => {
+          const destino = container.querySelector("#moveTo")?.value;
+          await runWithButton(container.querySelector("#confirmDeleteCat"), async () => {
+            for (const link of usados) {
+              await updateLink({ ...link, categoria: destino });
+            }
+            const result = await deleteCategory(id);
+            notifySaved(result, usados.length ? `Categoria exclu\xEDda. ${usados.length} atalho(s) foram para "${destino}".` : "Categoria exclu\xEDda.");
+            Modal.close();
+            await sync({ silent: true });
+            openCategories();
+          });
+        });
+      }
+    });
   }
   var EXPORT_HEADERS = [
     "ID",
@@ -6944,6 +7476,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       if (action === "new-link") openLinkForm();
       if (action === "edit-link") openLinkForm(id);
       if (action === "delete-link") removeLink(id);
+      if (action === "categories") openCategories();
     });
     $("#employeeGrid").addEventListener("click", (event) => {
       if (event.target.closest("button") || event.target.closest("a")) return;
@@ -6955,7 +7488,7 @@ html[data-theme="dark"] .badge--cake { color: var(--secondary); }
       if (file) importFile(file);
       event.target.value = "";
     });
-    $("#bannerRetry").addEventListener("click", () => isDemoMode() ? openDiagnostics() : sync());
+    $("#bannerRetry").addEventListener("click", () => openDiagnostics());
     setInterval(() => {
       if (!document.hidden) sync({ silent: true });
     }, CONFIG.pollInterval);
